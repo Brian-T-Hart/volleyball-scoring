@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Volleyball Scoreboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="scoreboard">
+
+        <section class="team team-a" data-team="A">
+            <div class="team-name">Team A</div>
+            <div class="score" id="scoreA">0</div>
+            <div class="score-change" id="feedbackA"></div>
+            <div class="instructions">
+                Swipe ↑ to score &nbsp; • &nbsp; Swipe ↓ to subtract
+            </div>
+        </section>
+
+        <section class="team team-b" data-team="B">
+            <div class="team-name">Team B</div>
+            <div class="score" id="scoreB">0</div>
+            <div class="score-change" id="feedbackB"></div>
+            <div class="instructions">
+                Swipe ↑ to score &nbsp; • &nbsp; Swipe ↓ to subtract
+            </div>
+        </section>
+
+    </main>
+
+    <div class="controls">
+        <button id="newGame">New Game</button>
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
