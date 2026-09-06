@@ -9,6 +9,8 @@ const DEFAULT_STATE = {
 
     format: 3,
 
+    showScoreControls: false,
+
     currentSet: 1,
 
     scores: {
@@ -56,6 +58,7 @@ const teamAInput = document.getElementById("teamAInput");
 const teamBInput = document.getElementById("teamBInput");
 
 const matchFormat = document.getElementById("matchFormat");
+const showScoreControls = document.getElementById("showScoreControls");
 
 const cancelSettings = document.getElementById("cancelSettings");
 const saveSettings = document.getElementById("saveSettings");
@@ -130,6 +133,11 @@ function loadState() {
 ============================================================= */
 
 function render() {
+
+    document.body.classList.toggle(
+        "score-controls-visible",
+        state.showScoreControls
+    );
 
     scoreA.textContent = state.scores.A;
     scoreB.textContent = state.scores.B;
@@ -523,6 +531,9 @@ function openSettings() {
     matchFormat.value =
         state.format;
 
+    showScoreControls.checked =
+        state.showScoreControls;
+
     settingsModal.classList.add("active");
 
 }
@@ -547,6 +558,9 @@ function saveSettingsHandler() {
 
     const newFormat =
         Number(matchFormat.value);
+
+    const newShowScoreControls =
+        showScoreControls.checked;
 
 
     /*
@@ -585,6 +599,9 @@ function saveSettingsHandler() {
 
     state.teams.B =
         newTeamB;
+
+    state.showScoreControls =
+        newShowScoreControls;
 
 
     if (formatChanged) {

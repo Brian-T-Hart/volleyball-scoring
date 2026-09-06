@@ -193,11 +193,13 @@ input {
     display: flex;
     gap: 8px;
     opacity: 0;
+    pointer-events: none;
     transition: opacity 0.2s ease;
 }
 
-.team:hover .score-controls {
+.score-controls-visible .score-controls {
     opacity: 1;
+    pointer-events: auto;
 }
 
 .score-button {
@@ -312,6 +314,19 @@ input {
     border: 1px solid #ccc;
     border-radius: 10px;
     background: white;
+}
+
+.modal-content .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    font-weight: 600;
+}
+
+.modal-content .checkbox-label input {
+    width: auto;
+    margin: 0;
 }
 
 .modal-buttons {
