@@ -22,53 +22,33 @@
                 <div class="score" id="scoreA">0</div>
 
                 <div class="score-controls">
-                    <button class="score-button" data-action="subtract" data-team="A" aria-label="Subtract one point">
-                        −
-                    </button>
-
-                    <button class="score-button" data-action="add" data-team="A" aria-label="Add one point">
-                        +
-                    </button>
-
+                    <button class="score-button" data-action="subtract" data-team="A"
+                        aria-label="Subtract one point">−</button>
+                    <button class="score-button" data-action="add" data-team="A" aria-label="Add one point">+</button>
                 </div>
-
-                <div class="instructions">Swipe ↑ to score &nbsp; • &nbsp; Swipe ↓ to subtract</div>
             </section>
 
 
             <!-- TEAM B -->
             <section class="team team-b" data-team="B">
                 <div class="team-header">
-                    <h2 class="team-name" id="teamNameB" title="Click to rename">
-                        Team B
-                    </h2>
+                    <h2 class="team-name" id="teamNameB" title="Click to rename">Team B</h2>
                 </div>
 
                 <div class="score" id="scoreB">0</div>
 
                 <div class="score-controls">
-                    <button class="score-button" data-action="subtract" data-team="B" aria-label="Subtract one point">
-                        −
-                    </button>
-
-                    <button class="score-button" data-action="add" data-team="B" aria-label="Add one point">
-                        +
-                    </button>
+                    <button class="score-button" data-action="subtract" data-team="B"
+                        aria-label="Subtract one point">−</button>
+                    <button class="score-button" data-action="add" data-team="B" aria-label="Add one point">+</button>
                 </div>
-
-                <div class="instructions">
-                    Swipe ↑ to score &nbsp; • &nbsp; Swipe ↓ to subtract
-                </div>
-
             </section>
         </main>
-
 
         <div class="match-score">
             <span class="sets-label">Sets</span>
             <span class="sets-score" id="setsScore">0 – 0</span>
         </div>
-
 
         <div class="set-indicator" id="setIndicator">Set 1 of 3</div>
 
@@ -101,10 +81,21 @@
                     Show score controls
                 </label>
 
+                <div class="help-section">
+                    <button class="help-button" id="helpButton" type="button">How to score?</button>
+                    <div class="help-content" id="helpContent" hidden>
+                        <p>- Swipe up on a team's side to add a point.<br>
+                            - Swipe down to subtract a point.<br>
+                            - You can also enable the score buttons by checking the "Show score controls" option above.
+                        </p>
+                    </div>
+                </div>
+
                 <div class="modal-buttons">
                     <button class="cancel-button" id="cancelSettings">Cancel</button>
                     <button class="primary-button" id="saveSettings">Save Settings</button>
                 </div>
+
             </div>
         </div>
 
@@ -116,6 +107,11 @@
 
                 <button class="announcement-button" id="announcementButton">Continue</button>
             </div>
+        </div>
+
+        <div class="first-launch-hint" id="firstLaunchHint" role="status">
+            <strong>How to score</strong>
+            <span>Swipe up to add a point. Swipe down to subtract.</span>
         </div>
     </div>
 
