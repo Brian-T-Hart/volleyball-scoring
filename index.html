@@ -3,41 +3,118 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+    <meta name="theme-color" content="#111111">
     <title>Volleyball Scoreboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <main class="scoreboard">
+    <div class="app">
+        <main class="scoreboard">
+            <section class="team team-a" data-team="A">
+                <div class="team-header">
+                    <h2 class="team-name" id="teamNameA" title="Click to rename">Team A</h2>
+                </div>
 
-        <section class="team team-a" data-team="A">
-            <div class="team-name">Team A</div>
-            <div class="score" id="scoreA">0</div>
-            <div class="score-change" id="feedbackA"></div>
-            <div class="instructions">
-                Swipe ↑ to score &nbsp; • &nbsp; Swipe ↓ to subtract
+                <div class="score" id="scoreA">0</div>
+
+                <div class="score-controls">
+                    <button class="score-button" data-action="subtract" data-team="A" aria-label="Subtract one point">
+                        −
+                    </button>
+
+                    <button class="score-button" data-action="add" data-team="A" aria-label="Add one point">
+                        +
+                    </button>
+
+                </div>
+
+                <div class="instructions">Swipe ↑ to score &nbsp; • &nbsp; Swipe ↓ to subtract</div>
+            </section>
+
+
+            <!-- TEAM B -->
+            <section class="team team-b" data-team="B">
+                <div class="team-header">
+                    <h2 class="team-name" id="teamNameB" title="Click to rename">
+                        Team B
+                    </h2>
+                </div>
+
+                <div class="score" id="scoreB">0</div>
+
+                <div class="score-controls">
+                    <button class="score-button" data-action="subtract" data-team="B" aria-label="Subtract one point">
+                        −
+                    </button>
+
+                    <button class="score-button" data-action="add" data-team="B" aria-label="Add one point">
+                        +
+                    </button>
+                </div>
+
+                <div class="instructions">
+                    Swipe ↑ to score &nbsp; • &nbsp; Swipe ↓ to subtract
+                </div>
+
+            </section>
+        </main>
+
+
+        <div class="match-score">
+            <span class="sets-label">Sets</span>
+            <span class="sets-score" id="setsScore">0 – 0</span>
+        </div>
+
+
+        <div class="set-indicator" id="setIndicator">Set 1 of 3</div>
+
+        <div class="controls">
+            <button class="control-button" id="undoButton">↶ Undo</button>
+            <button class="control-button" id="newSetButton">New Set</button>
+            <button class="control-button" id="newMatchButton">New Match</button>
+            <button class="control-button" id="settingsButton">⚙</button>
+        </div>
+
+        <div class="modal" id="settingsModal">
+            <div class="modal-content">
+                <h2>Match Settings</h2>
+
+                <label for="teamAInput">Team A</label>
+                <input id="teamAInput" type="text" maxlength="30" value="Team A">
+
+
+                <label for="teamBInput">Team B</label>
+                <input id="teamBInput" type="text" maxlength="30" value="Team B">
+
+                <label for="matchFormat">Match Format</label>
+                <select id="matchFormat">
+                    <option value="3">Best of 3</option>
+                    <option value="5">Best of 5</option>
+                </select>
+
+                <div class="modal-buttons">
+                    <button class="cancel-button" id="cancelSettings">Cancel</button>
+                    <button class="primary-button" id="saveSettings">Save Settings</button>
+                </div>
             </div>
-        </section>
+        </div>
 
-        <section class="team team-b" data-team="B">
-            <div class="team-name">Team B</div>
-            <div class="score" id="scoreB">0</div>
-            <div class="score-change" id="feedbackB"></div>
-            <div class="instructions">
-                Swipe ↑ to score &nbsp; • &nbsp; Swipe ↓ to subtract
+        <div class="announcement" id="announcement">
+            <div class="announcement-box">
+                <div class="announcement-label" id="announcementLabel">Set Winner</div>
+
+                <h1 class="announcement-title" id="announcementTitle">Team A</h1>
+
+                <button class="announcement-button" id="announcementButton">Continue</button>
             </div>
-        </section>
-
-    </main>
-
-    <div class="controls">
-        <button id="newGame">New Game</button>
+        </div>
     </div>
 
     <script src="script.js"></script>
-
 </body>
 
 </html>
