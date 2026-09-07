@@ -65,15 +65,19 @@ const saveSettings = document.getElementById("saveSettings");
 
 const announcement = document.getElementById("announcement");
 
-const announcementLabel =
-    document.getElementById("announcementLabel");
+const announcementLabel = document.getElementById("announcementLabel");
 
-const announcementTitle =
-    document.getElementById("announcementTitle");
+const announcementTitle = document.getElementById("announcementTitle");
 
-const announcementButton =
-    document.getElementById("announcementButton");
+const announcementButton = document.getElementById("announcementButton");
 
+const firstLaunchHint = document.getElementById("firstLaunchHint");
+
+const helpButton = document.getElementById("helpButton");
+
+const helpContent = document.getElementById("helpContent");
+
+const HINT_SEEN_KEY = "volleyballScoreboardHintSeen";
 
 /* =============================================================
    SAVE / LOAD
@@ -268,7 +272,7 @@ function checkForSetWinner(team) {
 
     if (!wonSet) return;
 
-    
+
     /*
      * Record the completed set.
      */
@@ -672,102 +676,45 @@ teamNameB.addEventListener(
    BUTTON CONTROLS
 ============================================================= */
 
-document
-    .querySelectorAll(".score-button")
-    .forEach(button => {
-
-        button.addEventListener(
-            "pointerdown",
-            event => {
-
-                event.stopPropagation();
-
-            }
-        );
-
-
-        button.addEventListener(
-            "click",
-            event => {
-
-                event.stopPropagation();
-
-                const team =
-                    button.dataset.team;
-
-                const action =
-                    button.dataset.action;
-
-                scorePoint(
-                    team,
-                    action === "add" ? 1 : -1
-                );
-
-            }
-        );
-
+document.querySelectorAll(".score-button").forEach(button => {
+    button.addEventListener("pointerdown", event => {
+        event.stopPropagation();
     });
 
-
-undoButton.addEventListener(
-    "click",
-    event => {
-
+    button.addEventListener("click", event => {
         event.stopPropagation();
+        const team = button.dataset.team;
+        const action = button.dataset.action;
+        scorePoint(team, action === "add" ? 1 : -1);
+        dismissFirstLaunchHint();
+    });
+});
 
-        undo();
-
-    }
-);
-
-
-newSetButton.addEventListener(
-    "click",
-    event => {
-
-        event.stopPropagation();
-
-        newSet();
-
-    }
-);
+undoButton.addEventListener("click", event => {
+    event.stopPropagation();
+    undo();
+});
 
 
-newMatchButton.addEventListener(
-    "click",
-    event => {
-
-        event.stopPropagation();
-
-        newMatch();
-
-    }
-);
+newSetButton.addEventListener("click", event => {
+    event.stopPropagation();
+    newSet();
+});
 
 
-settingsButton.addEventListener(
-    "click",
-    event => {
-
-        event.stopPropagation();
-
-        openSettings();
-
-    }
-);
+newMatchButton.addEventListener("click", event => {
+    event.stopPropagation();
+    newMatch();
+});
 
 
-cancelSettings.addEventListener(
-    "click",
-    closeSettings
-);
+settingsButton.addEventListener("click", event => {
+    event.stopPropagation();
+    openSettings();
+});
 
-
-saveSettings.addEventListener(
-    "click",
-    saveSettingsHandler
-);
-
+cancelSettings.addEventListener("click", closeSettings);
+saveSettings.addEventListener("click", saveSettingsHandler);
 
 /* =============================================================
    ANNOUNCEMENT BUTTON
@@ -846,101 +793,56 @@ document
         );
 
 
-        teamElement.addEventListener(
-            "pointerup",
-            event => {
+        teamElement.addEventListener("pointerup", event => {
 
-                if (!pointerDown) {
-                    return;
-                }
+            if (!pointerDown) return;
 
-                pointerDown = false;
+            pointerDown = false;
 
+            const endX = event.clientX;
+            const endY = event.clientY;
+            const deltaX = endX - startX;
+            const deltaY = endY - startY;
 
-                const endX =
-                    event.clientX;
+            /*
+             * Determine whether this was
+             * primarily a vertical swipe.
+             */
 
-                const endY =
-                    event.clientY;
+            const vertical = Math.abs(deltaY) > Math.abs(deltaX);
 
+            /*
+             * Require a minimum movement
+             * so a simple tap does not
+             * accidentally score.
+             */
 
-                const deltaX =
-                    endX - startX;
+            const validSwipe = Math.abs(deltaY) >= 50 && vertical;
 
-                const deltaY =
-                    endY - startY;
+            if (!validSwipe) return;
 
+            dismissFirstLaunchHint();
 
-                /*
-                 * Determine whether this was
-                 * primarily a vertical swipe.
-                 */
+            const team = teamElement.dataset.team;
 
-                const vertical =
-                    Math.abs(deltaY) >
-                    Math.abs(deltaX);
+            /*
+             * Swipe UP = +1
+             */
 
+            if (deltaY < 0) scorePoint(team, 1);
 
-                /*
-                 * Require a minimum movement
-                 * so a simple tap does not
-                 * accidentally score.
-                 */
+            /*
+             * Swipe DOWN = -1
+             */
 
-                const validSwipe =
-                    Math.abs(deltaY) >= 50 &&
-                    vertical;
-
-
-                if (!validSwipe) {
-                    return;
-                }
-
-
-                const team =
-                    teamElement.dataset.team;
-
-
-                /*
-                 * Swipe UP = +1
-                 */
-
-                if (deltaY < 0) {
-
-                    scorePoint(
-                        team,
-                        1
-                    );
-
-                }
-
-
-                /*
-                 * Swipe DOWN = -1
-                 */
-
-                else {
-
-                    scorePoint(
-                        team,
-                        -1
-                    );
-
-                }
-
-            }
+            else scorePoint(team, -1);
+        }
         );
 
 
-        teamElement.addEventListener(
-            "pointercancel",
-            () => {
-
-                pointerDown = false;
-
-            }
-        );
-
+        teamElement.addEventListener("pointercancel", () => {
+            pointerDown = false;
+        });
     });
 
 
@@ -981,6 +883,35 @@ document.addEventListener(
 
     }
 );
+
+function dismissFirstLaunchHint() {
+    if (!firstLaunchHint || firstLaunchHint.classList.contains("dismissed")) {
+        return;
+    }
+
+    firstLaunchHint.classList.add("dismissed");
+    localStorage.setItem(HINT_SEEN_KEY, "true");
+}
+
+function initializeFirstLaunchHint() {
+    if (localStorage.getItem(HINT_SEEN_KEY) === "true") {
+        firstLaunchHint.classList.add("dismissed");
+        return;
+    }
+
+    setTimeout(dismissFirstLaunchHint, 8000);
+}
+
+function toggleHelp() {
+    const isHidden = helpContent.hasAttribute("hidden");
+
+    helpContent.toggleAttribute("hidden", !isHidden);
+    helpButton.setAttribute("aria-expanded", String(isHidden));
+}
+
+helpButton.addEventListener("click", toggleHelp);
+
+initializeFirstLaunchHint();
 
 
 /* =============================================================
