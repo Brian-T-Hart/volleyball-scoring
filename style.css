@@ -238,6 +238,40 @@ input {
     display: flex;
     align-items: center;
     gap: 7px;
+    transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+.controls-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, 140%);
+}
+
+.controls-toggle {
+    position: absolute;
+    left: 50%;
+    bottom: max(2px, calc(env(safe-area-inset-bottom) - 8px));
+    z-index: 51;
+    width: 50px;
+    height: 25px;
+    padding: 2px 0;
+    border: 0;
+    border-radius: 12px 12px 0 0;
+    color: #111;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transform: translate(-50%, 120%);
+    transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+.controls-toggle.controls-hidden {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, 0);
 }
 
 .control-button {
@@ -544,6 +578,10 @@ input {
 
     .controls {
         bottom: max(8px, env(safe-area-inset-bottom));
+    }
+
+    .controls-toggle {
+        bottom: max(0px, calc(env(safe-area-inset-bottom) - 8px));
     }
 
     .control-button {

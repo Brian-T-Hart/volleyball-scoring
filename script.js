@@ -53,6 +53,8 @@ const newSetButton = document.getElementById("newSetButton");
 const newMatchButton = document.getElementById("newMatchButton");
 
 const settingsButton = document.getElementById("settingsButton");
+const controls = document.querySelector(".controls");
+const controlsToggle = document.getElementById("controlsToggle");
 
 const settingsModal = document.getElementById("settingsModal");
 
@@ -80,6 +82,8 @@ const helpButton = document.getElementById("helpButton");
 const helpContent = document.getElementById("helpContent");
 
 const HINT_SEEN_KEY = "volleyballScoreboardHintSeen";
+const CONTROLS_HIDE_DELAY = 5000;
+let controlsHideTimer;
 
 /* =============================================================
    SAVE / LOAD
@@ -167,6 +171,20 @@ function render() {
 
     saveState();
 
+}
+
+function setControlsHidden(hidden) {
+    controls.classList.toggle("controls-hidden", hidden);
+    controlsToggle.classList.toggle("controls-hidden", hidden);
+    controlsToggle.textContent = hidden ? "↑" : "↓";
+    controlsToggle.setAttribute("aria-label", hidden ? "Show controls" : "Hide controls");
+    controlsToggle.setAttribute("aria-expanded", String(!hidden));
+}
+
+function resetControlsHideTimer() {
+    clearTimeout(controlsHideTimer);
+    setControlsHidden(false);
+    controlsHideTimer = setTimeout(() => setControlsHidden(true), CONTROLS_HIDE_DELAY);
 }
 
 
@@ -704,6 +722,7 @@ document.querySelectorAll(".score-button").forEach(button => {
 
     button.addEventListener("click", event => {
         event.stopPropagation();
+        resetControlsHideTimer();
         const team = button.dataset.team;
         const action = button.dataset.action;
         scorePoint(team, action === "add" ? 1 : -1);
@@ -713,25 +732,40 @@ document.querySelectorAll(".score-button").forEach(button => {
 
 undoButton.addEventListener("click", event => {
     event.stopPropagation();
+    resetControlsHideTimer();
     undo();
 });
 
 
 newSetButton.addEventListener("click", event => {
     event.stopPropagation();
+    resetControlsHideTimer();
     newSet();
 });
 
 
 newMatchButton.addEventListener("click", event => {
     event.stopPropagation();
+    resetControlsHideTimer();
     newMatch();
 });
 
 
 settingsButton.addEventListener("click", event => {
     event.stopPropagation();
+    resetControlsHideTimer();
     openSettings();
+});
+
+controlsToggle.addEventListener("click", event => {
+    event.stopPropagation();
+    const hidden = controls.classList.contains("controls-hidden");
+    clearTimeout(controlsHideTimer);
+    setControlsHidden(!hidden);
+
+    if (hidden) {
+        controlsHideTimer = setTimeout(() => setControlsHidden(true), CONTROLS_HIDE_DELAY);
+    }
 });
 
 cancelSettings.addEventListener("click", closeSettings);
@@ -933,6 +967,7 @@ function toggleHelp() {
 helpButton.addEventListener("click", toggleHelp);
 
 initializeFirstLaunchHint();
+resetControlsHideTimer();
 
 
 /* =============================================================
