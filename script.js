@@ -722,7 +722,6 @@ document.querySelectorAll(".score-button").forEach(button => {
 
     button.addEventListener("click", event => {
         event.stopPropagation();
-        resetControlsHideTimer();
         const team = button.dataset.team;
         const action = button.dataset.action;
         scorePoint(team, action === "add" ? 1 : -1);
