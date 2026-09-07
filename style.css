@@ -248,30 +248,37 @@ input {
 }
 
 .controls-toggle {
-    position: absolute;
-    left: 50%;
-    bottom: max(2px, calc(env(safe-area-inset-bottom) - 8px));
-    z-index: 51;
-    width: 50px;
-    height: 25px;
-    padding: 2px 0;
+    background: rgba(255, 255, 255, 0.94);
     border: 0;
     border-radius: 12px 12px 0 0;
-    color: #111;
-    background: rgba(255, 255, 255, 0.94);
+    bottom: max(2px, calc(env(safe-area-inset-bottom) - 8px));
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
-    font-size: 1.1rem;
-    font-weight: 700;
-    line-height: 1;
+    color: #111;
     cursor: pointer;
-    transform: translate(-50%, 120%);
+    left: 50%;
+    line-height: 1;
+    padding: 5px 20px 0;
+    position: absolute;
+    transform: translate(-50%, 150%);
     transition: transform 0.35s ease, opacity 0.35s ease;
+    z-index: 51;
 }
 
 .controls-toggle.controls-hidden {
     opacity: 1;
     pointer-events: auto;
     transform: translate(-50%, 0);
+}
+
+.controls-toggle svg {
+    fill: #111;
+    height: 23px;
+    opacity: 1;
+    width: 20px;
+}
+
+.controls-toggle.controls-hidden svg {
+    transform: rotateZ(0);
 }
 
 .control-button {

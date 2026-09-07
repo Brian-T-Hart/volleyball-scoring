@@ -176,7 +176,7 @@ function render() {
 function setControlsHidden(hidden) {
     controls.classList.toggle("controls-hidden", hidden);
     controlsToggle.classList.toggle("controls-hidden", hidden);
-    controlsToggle.textContent = hidden ? "↑" : "↓";
+    // controlsToggle.textContent = hidden ? "↑" : "↓";
     controlsToggle.setAttribute("aria-label", hidden ? "Show controls" : "Hide controls");
     controlsToggle.setAttribute("aria-expanded", String(!hidden));
 }

@@ -64,8 +64,11 @@
         </div>
 
         <!-- Control toggle -->
-        <button class="controls-toggle" id="controlsToggle" type="button" aria-label="Hide controls"
-            aria-expanded="true">↑</button>
+        <button class="controls-toggle" id="controlsToggle" type="button" aria-label="Hide controls" aria-expanded="true">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                <path d="M201.4 105.4c12.5-12.5 32.8-12.5 45.3 0l192 192c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L224 173.3 54.6 342.6c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l192-192z"/>
+            </svg>
+        </button>
 
         <!-- Settings Modal -->
         <div class="modal" id="settingsModal">
@@ -94,10 +97,11 @@
                 <div class="help-section">
                     <button class="help-button" id="helpButton" type="button">How to score?</button>
                     <div class="help-content" id="helpContent" hidden>
-                        <p>- Swipe up on a team's side to add a point.<br>
-                            - Swipe down to subtract a point.<br>
-                            - You can also enable the score buttons by checking the "Show score controls" option above.
-                        </p>
+                        <ul>
+                            <li>Swipe up on a team's side to add a point.</li>
+                            <li>Swipe down to subtract a point.</li>
+                            <li>You can also enable the scoring buttons by checking the "Show score controls" option above.</li>
+                        </ul>
                     </div>
                 </div>
 
