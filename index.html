@@ -14,6 +14,8 @@
 
     <div class="app">
         <main class="scoreboard">
+
+            <!-- Team A -->
             <section class="team team-a" data-team="A">
                 <div class="team-header">
                     <h2 class="team-name" id="teamNameA" title="Click to rename">Team A</h2>
@@ -29,7 +31,7 @@
             </section>
 
 
-            <!-- TEAM B -->
+            <!-- Team B -->
             <section class="team team-b" data-team="B">
                 <div class="team-header">
                     <h2 class="team-name" id="teamNameB" title="Click to rename">Team B</h2>
@@ -45,6 +47,7 @@
             </section>
         </main>
 
+        <!-- Match Tracking -->
         <div class="match-score">
             <span class="sets-label">Sets</span>
             <span class="sets-score" id="setsScore">0 – 0</span>
@@ -52,6 +55,7 @@
 
         <div class="set-indicator" id="setIndicator">Set 1 of 3</div>
 
+        <!-- Controls -->
         <div class="controls">
             <button class="control-button" id="undoButton">↶ Undo</button>
             <button class="control-button" id="newSetButton">New Set</button>
@@ -59,9 +63,11 @@
             <button class="control-button" id="settingsButton">⚙</button>
         </div>
 
+        <!-- Control toggle -->
         <button class="controls-toggle" id="controlsToggle" type="button" aria-label="Hide controls"
             aria-expanded="true">↑</button>
 
+        <!-- Settings Modal -->
         <div class="modal" id="settingsModal">
             <div class="modal-content">
                 <h2>Match Settings</h2>
@@ -103,6 +109,7 @@
             </div>
         </div>
 
+        <!-- Announcement Modal -->
         <div class="announcement" id="announcement">
             <div class="announcement-box">
                 <div class="announcement-label" id="announcementLabel">Set Winner</div>
@@ -113,6 +120,7 @@
             </div>
         </div>
 
+        <!-- How to score hint for first-time users -->
         <div class="first-launch-hint" id="firstLaunchHint" role="status">
             <strong>How to score</strong>
             <span>Swipe up to add a point. Swipe down to subtract.</span>
