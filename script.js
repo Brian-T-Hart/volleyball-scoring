@@ -9,6 +9,8 @@ const DEFAULT_STATE = {
 
     format: 3,
 
+    singleSet: false,
+
     showScoreControls: false,
 
     currentSet: 1,
@@ -143,6 +145,11 @@ function render() {
         state.showScoreControls
     );
 
+    document.body.classList.toggle(
+        "single-set-mode",
+        state.singleSet
+    );
+
     scoreA.textContent = state.scores.A;
     scoreB.textContent = state.scores.B;
 
@@ -153,7 +160,7 @@ function render() {
         `${state.setsWon.A} – ${state.setsWon.B}`;
 
     setIndicator.textContent =
-        `Set ${state.currentSet} of ${state.format}`;
+        state.singleSet ? "Single Set" : `Set ${state.currentSet} of ${state.format}`;
 
     undoButton.disabled =
         state.history.length === 0;
@@ -261,7 +268,7 @@ function checkForSetWinner(team) {
      * Other sets are played to 25.
      */
 
-    const target = state.currentSet === state.format ? 15 : 25;
+    const target = state.singleSet ? 25 : state.currentSet === state.format ? 15 : 25;
 
     /*
      * Volleyball sets must be won by two points.
@@ -297,7 +304,7 @@ function checkForSetWinner(team) {
      */
 
     const setsNeeded =
-        Math.ceil(state.format / 2);
+        state.singleSet ? 1 : Math.ceil(state.format / 2);
 
 
     if (
@@ -444,6 +451,9 @@ function newMatch() {
     const format =
         state.format;
 
+    const singleSet =
+        state.singleSet;
+
 
     state = {
 
@@ -454,7 +464,9 @@ function newMatch() {
             B: teamB
         },
 
-        format: format
+        format: format,
+
+        singleSet: singleSet
 
     };
 
@@ -510,7 +522,7 @@ function undo() {
 function isMatchOver() {
 
     const setsNeeded =
-        Math.ceil(state.format / 2);
+        state.singleSet ? 1 : Math.ceil(state.format / 2);
 
     return (
         state.setsWon.A >= setsNeeded ||
@@ -533,7 +545,7 @@ function openSettings() {
         state.teams.B;
 
     matchFormat.value =
-        state.format;
+        state.singleSet ? "single" : state.format;
 
     showScoreControls.checked =
         state.showScoreControls;
@@ -560,8 +572,11 @@ function saveSettingsHandler() {
         teamBInput.value.trim() ||
         "Team B";
 
+    const newSingleSet =
+        matchFormat.value === "single";
+
     const newFormat =
-        Number(matchFormat.value);
+        newSingleSet ? state.format : Number(matchFormat.value);
 
     const newShowScoreControls =
         showScoreControls.checked;
@@ -574,6 +589,9 @@ function saveSettingsHandler() {
     const formatChanged =
         newFormat !== state.format;
 
+    const singleSetChanged =
+        newSingleSet !== state.singleSet;
+
     const matchStarted =
         state.scores.A > 0 ||
         state.scores.B > 0 ||
@@ -582,13 +600,13 @@ function saveSettingsHandler() {
 
 
     if (
-        formatChanged &&
+        (formatChanged || singleSetChanged) &&
         matchStarted
     ) {
 
         const confirmed =
             confirm(
-                "Changing the match format will start a new match. Continue?"
+                "Changing the match settings will start a new match. Continue?"
             );
 
         if (!confirmed) {
@@ -607,8 +625,11 @@ function saveSettingsHandler() {
     state.showScoreControls =
         newShowScoreControls;
 
+    state.singleSet =
+        newSingleSet;
 
-    if (formatChanged) {
+
+    if (formatChanged || singleSetChanged) {
 
         state.format =
             newFormat;
