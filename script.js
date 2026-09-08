@@ -82,8 +82,6 @@ const helpButton = document.getElementById("helpButton");
 const helpContent = document.getElementById("helpContent");
 
 const HINT_SEEN_KEY = "volleyballScoreboardHintSeen";
-const CONTROLS_HIDE_DELAY = 5000;
-let controlsHideTimer;
 
 /* =============================================================
    SAVE / LOAD
@@ -176,17 +174,9 @@ function render() {
 function setControlsHidden(hidden) {
     controls.classList.toggle("controls-hidden", hidden);
     controlsToggle.classList.toggle("controls-hidden", hidden);
-    // controlsToggle.textContent = hidden ? "↑" : "↓";
     controlsToggle.setAttribute("aria-label", hidden ? "Show controls" : "Hide controls");
     controlsToggle.setAttribute("aria-expanded", String(!hidden));
 }
-
-function resetControlsHideTimer() {
-    clearTimeout(controlsHideTimer);
-    setControlsHidden(false);
-    controlsHideTimer = setTimeout(() => setControlsHidden(true), CONTROLS_HIDE_DELAY);
-}
-
 
 /* =============================================================
    SCORE POINT
@@ -731,40 +721,39 @@ document.querySelectorAll(".score-button").forEach(button => {
 
 undoButton.addEventListener("click", event => {
     event.stopPropagation();
-    resetControlsHideTimer();
     undo();
 });
 
 
 newSetButton.addEventListener("click", event => {
     event.stopPropagation();
-    resetControlsHideTimer();
     newSet();
 });
 
 
 newMatchButton.addEventListener("click", event => {
     event.stopPropagation();
-    resetControlsHideTimer();
     newMatch();
 });
 
 
 settingsButton.addEventListener("click", event => {
     event.stopPropagation();
-    resetControlsHideTimer();
     openSettings();
+});
+
+document.addEventListener("pointerdown", event => {
+    if (event.target.closest(".controls, .controls-toggle, .score-button")) {
+        return;
+    }
+
+    setControlsHidden(true);
 });
 
 controlsToggle.addEventListener("click", event => {
     event.stopPropagation();
     const hidden = controls.classList.contains("controls-hidden");
-    clearTimeout(controlsHideTimer);
     setControlsHidden(!hidden);
-
-    if (hidden) {
-        controlsHideTimer = setTimeout(() => setControlsHidden(true), CONTROLS_HIDE_DELAY);
-    }
 });
 
 cancelSettings.addEventListener("click", closeSettings);
@@ -966,7 +955,6 @@ function toggleHelp() {
 helpButton.addEventListener("click", toggleHelp);
 
 initializeFirstLaunchHint();
-resetControlsHideTimer();
 
 
 /* =============================================================
