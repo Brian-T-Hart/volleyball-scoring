@@ -1,19 +1,18 @@
 const STORAGE_KEY = "volleyballScoreboard";
 
 const DEFAULT_STATE = {
+    currentSet: 1,
+    format: 3,
+    showScoreControls: false,
+    singleSet: false,
+
+    completedSets: [],
+    history: [],
 
     teams: {
         A: "Team A",
         B: "Team B"
     },
-
-    format: 3,
-
-    singleSet: false,
-
-    showScoreControls: false,
-
-    currentSet: 1,
 
     scores: {
         A: 0,
@@ -23,12 +22,7 @@ const DEFAULT_STATE = {
     setsWon: {
         A: 0,
         B: 0
-    },
-
-    completedSets: [],
-
-    history: []
-
+    }
 };
 
 let state = loadState();
@@ -141,16 +135,8 @@ function loadState() {
 ============================================================= */
 
 function render() {
-
-    document.body.classList.toggle(
-        "score-controls-visible",
-        state.showScoreControls
-    );
-
-    document.body.classList.toggle(
-        "single-set-mode",
-        state.singleSet
-    );
+    document.body.classList.toggle("score-controls-visible", state.showScoreControls);
+    document.body.classList.toggle("single-set-mode", state.singleSet);
 
     scoreA.textContent = state.scores.A;
     scoreB.textContent = state.scores.B;
@@ -158,17 +144,12 @@ function render() {
     teamNameA.textContent = state.teams.A;
     teamNameB.textContent = state.teams.B;
 
-    setsScore.textContent =
-        `${state.setsWon.A} – ${state.setsWon.B}`;
+    setsScore.textContent = `${state.setsWon.A} – ${state.setsWon.B}`;
+    setIndicator.textContent = state.singleSet ? "Single Set" : `Set ${state.currentSet} of ${state.format}`;
 
-    setIndicator.textContent =
-        state.singleSet ? "Single Set" : `Set ${state.currentSet} of ${state.format}`;
-
-    undoButton.disabled =
-        state.history.length === 0;
+    undoButton.disabled = state.history.length === 0;
 
     saveState();
-
 }
 
 function setControlsHidden(hidden) {
@@ -184,32 +165,14 @@ function setControlsHidden(hidden) {
 
 function scorePoint(team, amount) {
 
-    /*
-     * Don't allow scoring once the match has been won.
-     */
+    /* Don't allow scoring once the match has been won. */
+    if (isMatchOver()) { return; }
 
-    if (isMatchOver()) {
-        return;
-    }
+    /* Don't allow score below zero. */
+    if (amount < 0 && state.scores[team] === 0) { return; }
 
 
-    /*
-     * Don't allow score below zero.
-     */
-
-    if (
-        amount < 0 &&
-        state.scores[team] === 0
-    ) {
-        return;
-    }
-
-
-    /*
-     * Save state before changing it.
-     * This creates the undo history.
-     */
-
+    /* Save state before changing it to create undo history. */
     state.history.push(
         JSON.stringify({
             scores: { ...state.scores },
@@ -221,37 +184,21 @@ function scorePoint(team, amount) {
         })
     );
 
-
     state.scores[team] += amount;
 
-
-    /*
-     * Check whether the point resulted in
-     * a set win.
-     */
-
+    /* Check whether the point resulted in a set win. */
     checkForSetWinner(team);
 
     render();
 
 
-    /*
-     * Visual feedback.
-     */
-
-    const teamElement =
-        document.querySelector(
-            `.team[data-team="${team}"]`
-        );
-
+    /* Visual feedback. */
+    const teamElement = document.querySelector(`.team[data-team="${team}"]`);
     teamElement.classList.add("scoring");
 
     setTimeout(() => {
-
         teamElement.classList.remove("scoring");
-
     }, 150);
-
 }
 
 
@@ -260,78 +207,38 @@ function scorePoint(team, amount) {
 ============================================================= */
 
 function checkForSetWinner(team) {
+    const opponent = team === "A" ? "B" : "A";
+    const score = state.scores[team];
+    const opponentScore = state.scores[opponent];
 
-    const opponent =
-        team === "A" ? "B" : "A";
-
-    const score =
-        state.scores[team];
-
-    const opponentScore =
-        state.scores[opponent];
-
-
-    /*
-     * The final set is played to 15.
-     * Other sets are played to 25.
-     */
-
+    /* Final set is played to 15. Other sets are played to 25. */
     const target = state.singleSet ? 25 : state.currentSet === state.format ? 15 : 25;
 
-    /*
-     * Volleyball sets must be won by two points.
-     */
-
+    /* Volleyball sets must be won by two points. */
     const wonSet = score >= target && score - opponentScore >= 2;
-
 
     if (!wonSet) return;
 
-
-    /*
-     * Record the completed set.
-     */
-
+    /* Record the completed set. */
     state.setsWon[team]++;
 
     state.completedSets.push({
-
         set: state.currentSet,
-
         A: state.scores.A,
-
         B: state.scores.B,
-
         winner: team
-
     });
 
+    /* Check whether the entire match is won. */
+    const setsNeeded = state.singleSet ? 1 : Math.ceil(state.format / 2);
 
-    /*
-     * Check whether the entire match is won.
-     */
-
-    const setsNeeded =
-        state.singleSet ? 1 : Math.ceil(state.format / 2);
-
-
-    if (
-        state.setsWon[team] >= setsNeeded
-    ) {
-
+    if (state.setsWon[team] >= setsNeeded) {
         showMatchWinner(team);
-
         return;
     }
 
-
-    /*
-     * Otherwise show the set winner and
-     * advance to the next set.
-     */
-
+    /* Otherwise show the set winner and advance to the next set. */
     showSetWinner(team);
-
 }
 
 
@@ -340,27 +247,13 @@ function checkForSetWinner(team) {
 ============================================================= */
 
 function showSetWinner(team) {
-
-    announcementLabel.textContent =
-        `Set ${state.currentSet} Winner`;
-
-    announcementTitle.textContent =
-        state.teams[team];
-
-    announcementButton.textContent =
-        "Start Next Set";
-
+    announcementLabel.textContent = `Set ${state.currentSet} Winner`;
+    announcementTitle.textContent = state.teams[team];
+    announcementButton.textContent = "Start Next Set";
     announcement.classList.add("active");
 
-
-    /*
-     * Store which action should happen when
-     * the announcement button is clicked.
-     */
-
-    announcementButton.dataset.action =
-        "next-set";
-
+    /* Store which action should happen when the announcement button is clicked. */
+    announcementButton.dataset.action = "next-set";
 }
 
 
@@ -369,21 +262,11 @@ function showSetWinner(team) {
 ============================================================= */
 
 function showMatchWinner(team) {
-
-    announcementLabel.textContent =
-        "Match Winner";
-
-    announcementTitle.textContent =
-        state.teams[team];
-
-    announcementButton.textContent =
-        "New Match";
-
+    announcementLabel.textContent = "Match Winner";
+    announcementTitle.textContent = state.teams[team];
+    announcementButton.textContent = "New Match";
     announcement.classList.add("active");
-
-    announcementButton.dataset.action =
-        "new-match";
-
+    announcementButton.dataset.action = "new-match";
 }
 
 
@@ -392,16 +275,13 @@ function showMatchWinner(team) {
 ============================================================= */
 
 function startNextSet() {
-
     state.currentSet++;
-
     state.scores.A = 0;
     state.scores.B = 0;
 
     announcement.classList.remove("active");
 
     render();
-
 }
 
 
@@ -410,27 +290,17 @@ function startNextSet() {
 ============================================================= */
 
 function newSet() {
+    if (isMatchOver()) { return; }
 
-    if (isMatchOver()) {
-        return;
-    }
+    const confirmed = confirm("Start a new set? The current set score will be discarded.");
 
-    const confirmed =
-        confirm(
-            "Start a new set? The current set score will be discarded."
-        );
-
-    if (!confirmed) {
-        return;
-    }
+    if (!confirmed) { return; }
 
     state.scores.A = 0;
     state.scores.B = 0;
-
     state.history = [];
 
     render();
-
 }
 
 
@@ -439,50 +309,27 @@ function newSet() {
 ============================================================= */
 
 function newMatch() {
+    const confirmed = confirm("Start a new match? The current match score will be reset.");
+    if (!confirmed) { return; }
 
-    const confirmed =
-        confirm(
-            "Start a new match? The current match score will be reset."
-        );
-
-    if (!confirmed) {
-        return;
-    }
-
-
-    const teamA =
-        state.teams.A;
-
-    const teamB =
-        state.teams.B;
-
-    const format =
-        state.format;
-
-    const singleSet =
-        state.singleSet;
-
+    const teamA = state.teams.A;
+    const teamB = state.teams.B;
+    const format = state.format;
+    const singleSet = state.singleSet;
 
     state = {
-
         ...structuredClone(DEFAULT_STATE),
-
         teams: {
             A: teamA,
             B: teamB
         },
-
         format: format,
-
         singleSet: singleSet
-
     };
-
 
     announcement.classList.remove("active");
 
     render();
-
 }
 
 
@@ -491,35 +338,18 @@ function newMatch() {
 ============================================================= */
 
 function undo() {
+    if (state.history.length === 0) { return; }
 
-    if (state.history.length === 0) {
-        return;
-    }
+    const previous = JSON.parse(state.history.pop());
 
-
-    const previous =
-        JSON.parse(
-            state.history.pop()
-        );
-
-
-    state.scores =
-        previous.scores;
-
-    state.setsWon =
-        previous.setsWon;
-
-    state.currentSet =
-        previous.currentSet;
-
-    state.completedSets =
-        previous.completedSets;
-
+    state.scores = previous.scores;
+    state.setsWon = previous.setsWon;
+    state.currentSet = previous.currentSet;
+    state.completedSets = previous.completedSets;
 
     announcement.classList.remove("active");
 
     render();
-
 }
 
 
@@ -529,13 +359,9 @@ function undo() {
 
 function isMatchOver() {
 
-    const setsNeeded =
-        state.singleSet ? 1 : Math.ceil(state.format / 2);
+    const setsNeeded = state.singleSet ? 1 : Math.ceil(state.format / 2);
 
-    return (
-        state.setsWon.A >= setsNeeded ||
-        state.setsWon.B >= setsNeeded
-    );
+    return (state.setsWon.A >= setsNeeded || state.setsWon.B >= setsNeeded);
 
 }
 
@@ -545,60 +371,29 @@ function isMatchOver() {
 ============================================================= */
 
 function openSettings() {
-
-    teamAInput.value =
-        state.teams.A;
-
-    teamBInput.value =
-        state.teams.B;
-
-    matchFormat.value =
-        state.singleSet ? "single" : state.format;
-
-    showScoreControls.checked =
-        state.showScoreControls;
+    teamAInput.value = state.teams.A;
+    teamBInput.value = state.teams.B;
+    matchFormat.value = state.singleSet ? "single" : state.format;
+    showScoreControls.checked = state.showScoreControls;
 
     settingsModal.classList.add("active");
-
 }
 
 
 function closeSettings() {
-
     settingsModal.classList.remove("active");
-
 }
 
-
 function saveSettingsHandler() {
+    const newTeamA = teamAInput.value.trim() || "Team A";
+    const newTeamB = teamBInput.value.trim() || "Team B";
+    const newSingleSet = matchFormat.value === "single";
+    const newFormat = newSingleSet ? state.format : Number(matchFormat.value);
+    const newShowScoreControls = showScoreControls.checked;
 
-    const newTeamA =
-        teamAInput.value.trim() ||
-        "Team A";
-
-    const newTeamB =
-        teamBInput.value.trim() ||
-        "Team B";
-
-    const newSingleSet =
-        matchFormat.value === "single";
-
-    const newFormat =
-        newSingleSet ? state.format : Number(matchFormat.value);
-
-    const newShowScoreControls =
-        showScoreControls.checked;
-
-
-    /*
-     * Changing the format resets the match.
-     */
-
-    const formatChanged =
-        newFormat !== state.format;
-
-    const singleSetChanged =
-        newSingleSet !== state.singleSet;
+    /* Changing the format resets the match. */
+    const formatChanged = newFormat !== state.format;
+    const singleSetChanged = newSingleSet !== state.singleSet;
 
     const matchStarted =
         state.scores.A > 0 ||
@@ -606,70 +401,30 @@ function saveSettingsHandler() {
         state.setsWon.A > 0 ||
         state.setsWon.B > 0;
 
-
-    if (
-        (formatChanged || singleSetChanged) &&
-        matchStarted
-    ) {
-
-        const confirmed =
-            confirm(
-                "Changing the match settings will start a new match. Continue?"
-            );
-
-        if (!confirmed) {
-            return;
-        }
-
+    if ((formatChanged || singleSetChanged) && matchStarted) {
+        const confirmed = confirm("Changing the match settings will start a new match. Continue?");
+        if (!confirmed) { return; }
     }
 
-
-    state.teams.A =
-        newTeamA;
-
-    state.teams.B =
-        newTeamB;
-
-    state.showScoreControls =
-        newShowScoreControls;
-
-    state.singleSet =
-        newSingleSet;
-
+    state.teams.A = newTeamA;
+    state.teams.B = newTeamB;
+    state.showScoreControls = newShowScoreControls;
+    state.singleSet = newSingleSet;
 
     if (formatChanged || singleSetChanged) {
-
-        state.format =
-            newFormat;
-
-        state.currentSet =
-            1;
-
-        state.scores.A =
-            0;
-
-        state.scores.B =
-            0;
-
-        state.setsWon.A =
-            0;
-
-        state.setsWon.B =
-            0;
-
-        state.completedSets =
-            [];
-
-        state.history =
-            [];
-
+        state.format = newFormat;
+        state.currentSet = 1;
+        state.scores.A = 0;
+        state.scores.B = 0;
+        state.setsWon.A = 0;
+        state.setsWon.B = 0;
+        state.completedSets = [];
+        state.history = [];
     }
-
 
     closeSettings();
 
     render();
-
 }
 
 
@@ -677,28 +432,15 @@ function saveSettingsHandler() {
    TEAM NAME CLICK
 ============================================================= */
 
-teamNameA.addEventListener(
-    "click",
-    event => {
+teamNameA.addEventListener("click", event => {
+    event.stopPropagation();
+    openSettings();
+});
 
-        event.stopPropagation();
-
-        openSettings();
-
-    }
-);
-
-
-teamNameB.addEventListener(
-    "click",
-    event => {
-
-        event.stopPropagation();
-
-        openSettings();
-
-    }
-);
+teamNameB.addEventListener("click", event => {
+    event.stopPropagation();
+    openSettings();
+});
 
 
 /* =============================================================
@@ -763,169 +505,112 @@ saveSettings.addEventListener("click", saveSettingsHandler);
    ANNOUNCEMENT BUTTON
 ============================================================= */
 
-announcementButton.addEventListener(
-    "click",
-    () => {
+announcementButton.addEventListener("click", () => {
 
-        const action =
-            announcementButton.dataset.action;
+    const action = announcementButton.dataset.action;
 
-
-        if (action === "next-set") {
-
-            startNextSet();
-
-        }
-
-        else if (action === "new-match") {
-
-            announcement.classList.remove("active");
-
-            newMatch();
-
-        }
-
+    if (action === "next-set") {
+        startNextSet();
     }
-);
+
+    else if (action === "new-match") {
+        announcement.classList.remove("active");
+        newMatch();
+    }
+});
 
 
 /* =============================================================
    SWIPE DETECTION
 ============================================================= */
 
-document
-    .querySelectorAll(".team")
-    .forEach(teamElement => {
+document.querySelectorAll(".team").forEach(teamElement => {
+    let startX = 0;
+    let startY = 0;
+    let pointerDown = false;
 
-        let startX = 0;
-        let startY = 0;
+    teamElement.addEventListener("pointerdown", event => {
 
-        let pointerDown = false;
-
-
-        teamElement.addEventListener(
-            "pointerdown",
-            event => {
-
-                /*
-                 * Ignore touches that begin on
-                 * interactive controls.
-                 */
-
-                if (
-                    event.target.closest("button") ||
-                    event.target.closest(".team-name")
-                ) {
-                    return;
-                }
-
-
-                pointerDown = true;
-
-                startX =
-                    event.clientX;
-
-                startY =
-                    event.clientY;
-
-                teamElement.setPointerCapture(
-                    event.pointerId
-                );
-
-            }
-        );
-
-
-        teamElement.addEventListener("pointerup", event => {
-
-            if (!pointerDown) return;
-
-            pointerDown = false;
-
-            const endX = event.clientX;
-            const endY = event.clientY;
-            const deltaX = endX - startX;
-            const deltaY = endY - startY;
-
-            /*
-             * Determine whether this was
-             * primarily a vertical swipe.
-             */
-
-            const vertical = Math.abs(deltaY) > Math.abs(deltaX);
-
-            /*
-             * Require a minimum movement
-             * so a simple tap does not
-             * accidentally score.
-             */
-
-            const validSwipe = Math.abs(deltaY) >= 50 && vertical;
-
-            if (!validSwipe) return;
-
-            dismissFirstLaunchHint();
-
-            const team = teamElement.dataset.team;
-
-            /*
-             * Swipe UP = +1
-             */
-
-            if (deltaY < 0) scorePoint(team, 1);
-
-            /*
-             * Swipe DOWN = -1
-             */
-
-            else scorePoint(team, -1);
+        /* Ignore touches that begin on interactive controls. */
+        if (event.target.closest("button") || event.target.closest(".team-name")) {
+            return;
         }
+
+        pointerDown = true;
+        startX = event.clientX;
+        startY = event.clientY;
+
+        teamElement.setPointerCapture(
+            event.pointerId
         );
-
-
-        teamElement.addEventListener("pointercancel", () => {
-            pointerDown = false;
-        });
     });
+
+    teamElement.addEventListener("pointerup", event => {
+
+        if (!pointerDown) return;
+
+        pointerDown = false;
+
+        const endX = event.clientX;
+        const endY = event.clientY;
+        const deltaX = endX - startX;
+        const deltaY = endY - startY;
+
+        /* Determine whether this was primarily a vertical swipe. */
+        const vertical = Math.abs(deltaY) > Math.abs(deltaX);
+
+        /* Require a minimum movement so a simple tap does not accidentally score. */
+        const validSwipe = Math.abs(deltaY) >= 50 && vertical;
+        if (!validSwipe) return;
+
+        dismissFirstLaunchHint();
+
+        const team = teamElement.dataset.team;
+
+        /* Swipe UP = +1 */
+        if (deltaY < 0) scorePoint(team, 1);
+
+        /* Swipe DOWN = -1 */
+        else scorePoint(team, -1);
+    });
+
+    teamElement.addEventListener("pointercancel", () => {
+        pointerDown = false;
+    });
+});
 
 
 /* =============================================================
    KEYBOARD SUPPORT
    ============================================================= */
 
-document.addEventListener(
-    "keydown",
-    event => {
+document.addEventListener("keydown", event => {
 
-        switch (event.key) {
+    switch (event.key) {
+        case "ArrowUp":
+            scorePoint("B", 1);
+            break;
 
-            case "ArrowUp":
-                scorePoint("A", 1);
-                break;
+        case "ArrowDown":
+            scorePoint("B", -1);
+            break;
 
-            case "ArrowDown":
-                scorePoint("A", -1);
-                break;
+        case "w":
+        case "W":
+            scorePoint("A", 1);
+            break;
 
-            case "w":
-            case "W":
-                scorePoint("B", 1);
-                break;
+        case "s":
+        case "S":
+            scorePoint("A", -1);
+            break;
 
-            case "s":
-            case "S":
-                scorePoint("B", -1);
-                break;
-
-            case "z":
-            case "Z":
-                undo();
-                break;
-
-        }
-
+        case "z":
+        case "Z":
+            undo();
+            break;
     }
-);
+});
 
 function dismissFirstLaunchHint() {
     if (!firstLaunchHint || firstLaunchHint.classList.contains("dismissed")) {
