@@ -168,6 +168,13 @@ function scorePoint(team, amount) {
     /* Don't allow scoring once the match has been won. */
     if (isMatchOver()) { return; }
 
+    /* Don't add score if set is already won. */
+    const currentSetCompleted = state.completedSets.some(
+        completedSet => completedSet.set === state.currentSet
+    );
+
+    if (currentSetCompleted) { return; }
+
     /* Don't allow score below zero. */
     if (amount < 0 && state.scores[team] === 0) { return; }
 
